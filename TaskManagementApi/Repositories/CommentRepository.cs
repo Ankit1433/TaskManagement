@@ -9,16 +9,20 @@ public class CommentRepository : ICommentRepository
 {
     private readonly DbConnectionFactory _connectionFactory;
 
-    public CommentRepository(DbConnectionFactory connectionFactory)
+    public CommentRepository(
+        DbConnectionFactory connectionFactory)
     {
         _connectionFactory = connectionFactory;
     }
 
-    public async Task<List<TaskComment>> GetByTaskIdAsync(int taskId)
+    public async Task<List<TaskComment>> GetByTaskIdAsync(
+        int taskId)
     {
         var comments = new List<TaskComment>();
 
-        await using var connection = _connectionFactory.CreateConnection();
+        await using var connection =
+            _connectionFactory.CreateConnection();
+
         await connection.OpenAsync();
 
         const string sql = """
@@ -32,11 +36,15 @@ public class CommentRepository : ICommentRepository
             ORDER BY created_at;
             """;
 
-        await using var command = new NpgsqlCommand(sql, connection);
+        await using var command =
+            new NpgsqlCommand(sql, connection);
 
-        command.Parameters.AddWithValue("task_id", taskId);
+        command.Parameters.AddWithValue(
+            "task_id",
+            taskId);
 
-        await using var reader = await command.ExecuteReaderAsync();
+        await using var reader =
+            await command.ExecuteReaderAsync();
 
         while (await reader.ReadAsync())
         {
@@ -53,9 +61,12 @@ public class CommentRepository : ICommentRepository
         return comments;
     }
 
-    public async Task<int> CreateAsync(TaskComment comment)
+    public async Task<int> CreateAsync(
+        TaskComment comment)
     {
-        await using var connection = _connectionFactory.CreateConnection();
+        await using var connection =
+            _connectionFactory.CreateConnection();
+
         await connection.OpenAsync();
 
         const string sql = """
@@ -74,14 +85,67 @@ public class CommentRepository : ICommentRepository
             RETURNING id;
             """;
 
-        await using var command = new NpgsqlCommand(sql, connection);
+        await using var command =
+            new NpgsqlCommand(sql, connection);
 
-        command.Parameters.AddWithValue("task_id", comment.TaskId);
-        command.Parameters.AddWithValue("user_id", comment.UserId);
-        command.Parameters.AddWithValue("comment", comment.Comment);
+        command.Parameters.AddWithValue(
+            "task_id",
+            comment.TaskId);
 
-        var result = await command.ExecuteScalarAsync();
+        command.Parameters.AddWithValue(
+            "user_id",
+            comment.UserId);
+
+        command.Parameters.AddWithValue(
+            "comment",
+            comment.Comment);
+
+        var result =
+            await command.ExecuteScalarAsync();
 
         return Convert.ToInt32(result);
+    }
+
+    public async Task<TaskComment?> GetByIdAsync(
+        int id)
+    {
+        await using var connection =
+            _connectionFactory.CreateConnection();
+
+        await connection.OpenAsync();
+
+        const string sql = """
+            SELECT id,
+                   task_id,
+                   user_id,
+                   comment,
+                   created_at
+            FROM task_comments
+            WHERE id = @id;
+            """;
+
+        await using var command =
+            new NpgsqlCommand(sql, connection);
+
+        command.Parameters.AddWithValue(
+            "id",
+            id);
+
+        await using var reader =
+            await command.ExecuteReaderAsync();
+
+        if (!await reader.ReadAsync())
+        {
+            return null;
+        }
+
+        return new TaskComment
+        {
+            Id = reader.GetInt32(0),
+            TaskId = reader.GetInt32(1),
+            UserId = reader.GetInt32(2),
+            Comment = reader.GetString(3),
+            CreatedAt = reader.GetDateTime(4)
+        };
     }
 }

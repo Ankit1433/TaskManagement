@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace TaskManagementApi.DTOs.Tasks;
+namespace TaskManagementMvc.Models.ApiModels.Tasks;
 
-public class UpdateTaskRequest
+public class CreateTaskRequest
 {
     [Required]
     [StringLength(200, MinimumLength = 3)]
@@ -15,9 +15,6 @@ public class UpdateTaskRequest
     public int AssignedTo { get; set; }
 
     [Required]
-    [RegularExpression(
-        "^(Low|Medium|High)$",
-        ErrorMessage = "Priority must be Low, Medium, or High.")]
     public string Priority { get; set; } = "Medium";
 
     public DateTime? DueDate { get; set; }

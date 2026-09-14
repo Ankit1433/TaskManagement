@@ -19,14 +19,56 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+                   <ul class="navbar-nav">
+
+    @if (Context.Session.GetString("Token") != null)
+    {
+        <li class="nav-item">
+            <a class="nav-link text-dark"
+               asp-controller="Task"
+               asp-action="Index">
+                Tasks
+            </a>
+        </li>
+
+        @if (Context.Session.GetString("Role") == "Manager")
+        {
+            <li class="nav-item">
+                <a class="nav-link text-dark"
+                   asp-controller="Task"
+                   asp-action="Create">
+                    Create Task
+                </a>
+            </li>
+        }
+
+        <li class="nav-item">
+            <span class="nav-link">
+                @Context.Session.GetString("Name")
+                (@Context.Session.GetString("Role"))
+            </span>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link text-danger"
+               asp-controller="Auth"
+               asp-action="Logout">
+                Logout
+            </a>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link"
+               asp-controller="Auth"
+               asp-action="Login">
+                Login
+            </a>
+        </li>
+    }
+
+</ul>
                 </div>
             </div>
         </nav>

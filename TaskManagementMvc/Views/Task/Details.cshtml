@@ -1,0 +1,203 @@
+@model TaskManagementMvc.Models.ViewModels.TaskDetailsViewModel
+
+@{
+    ViewData["Title"] = "Task Details";
+}
+
+<div class="container mt-4">
+
+    <h2>Task Details</h2>
+
+    <hr />
+
+    <h3>@Model.Task.Title</h3>
+
+    <p>
+        <strong>ID:</strong>
+        @Model.Task.Id
+    </p>
+
+    <p>
+        <strong>Status:</strong>
+        @Model.Task.Status
+    </p>
+
+    <p>
+        <strong>Description:</strong>
+        @(Model.Task.Description ?? "No description")
+    </p>
+
+    <p>
+        <strong>Priority:</strong>
+        @(Model.Task.Priority ?? "-")
+    </p>
+
+    <p>
+        <strong>Assigned To:</strong>
+        @(Model.Task.AssignedTo?.ToString() ?? "-")
+    </p>
+
+    <p>
+        <strong>Created By:</strong>
+        @(Model.Task.CreatedBy?.ToString() ?? "-")
+    </p>
+
+    <p>
+        <strong>Due Date:</strong>
+        @(Model.Task.DueDate?.ToString("dd-MM-yyyy HH:mm") ?? "-")
+    </p>
+
+    <p>
+        <strong>Created At:</strong>
+        @(Model.Task.CreatedAt?.ToString("dd-MM-yyyy HH:mm") ?? "-")
+    </p>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
+<hr />
+
+<h4>Update Status</h4>
+
+<form asp-action="UpdateStatus"
+      asp-route-id="@Model.Task.Id"
+      method="post">
+
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3">
+
+        <label class="form-label">
+            Status
+        </label>
+
+        <select name="Status"
+                class="form-select">
+
+            @if (Model.Task.Status == "Pending")
+            {
+                <option value="In Progress">
+                    In Progress
+                </option>
+            }
+            else if (Model.Task.Status == "In Progress")
+            {
+                <option value="Completed">
+                    Completed
+                </option>
+            }
+            else
+            {
+                <option value="Completed" selected>
+                    Completed
+                </option>
+            }
+
+        </select>
+
+    </div>
+
+    @if (Model.Task.Status != "Completed")
+    {
+        <button type="submit"
+                class="btn btn-primary">
+            Update Status
+        </button>
+    }
+    else
+    {
+        <span class="text-muted">
+            This task is completed and cannot be changed.
+        </span>
+    }
+
+</form>
+
+<hr />
+
+<h4>Comments</h4>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
+@if (!Model.Comments.Any())
+{
+    <p class="text-muted">
+        No comments yet.
+    </p>
+}
+else
+{
+    @foreach (var comment in Model.Comments)
+    {
+        <div class="card mb-2">
+            <div class="card-body">
+
+                <p class="mb-1">
+                    @comment.Comment
+                </p>
+
+                <small class="text-muted">
+                    User @comment.UserId
+                    —
+                    @comment.CreatedAt.ToString(
+                        "dd-MM-yyyy HH:mm")
+                </small>
+
+            </div>
+        </div>
+    }
+}
+
+<hr />
+
+<h5>Add Comment</h5>
+
+<form asp-action="AddComment"
+      asp-route-taskId="@Model.Task.Id"
+      method="post">
+
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3">
+        <textarea name="Comment"
+                  class="form-control"
+                  rows="3"
+                  placeholder="Write a comment..."></textarea>
+    </div>
+
+    <button type="submit"
+            class="btn btn-primary">
+        Add Comment
+    </button>
+
+</form>
+
+    <a asp-action="Index"
+       class="btn btn-secondary">
+        Back
+    </a>
+
+</div>

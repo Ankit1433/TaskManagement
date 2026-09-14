@@ -1,0 +1,72 @@
+@model List<TaskManagementMvc.Models.ApiModels.Tasks.TaskResponse>
+
+@{
+    ViewData["Title"] = "Tasks";
+}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Tasks</h2>
+
+        <a asp-controller="Task"
+           asp-action="Create"
+           class="btn btn-primary">
+            Create Task
+        </a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            No tasks found.
+        </div>
+    }
+    else
+    {
+        <table class="table table-bordered table-striped">
+
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>Due Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var task in Model)
+                {
+                    <tr>
+                        <td>@task.Id</td>
+
+                        <td>@task.Title</td>
+
+                        <td>@task.Status</td>
+
+                        <td>@task.Priority</td>
+
+                        <td>
+                            @(task.DueDate?.ToString("dd-MM-yyyy")
+                              ?? "-")
+                        </td>
+
+                        <td>
+                            <a asp-controller="Task"
+                               asp-action="Details"
+                               asp-route-id="@task.Id"
+                               class="btn btn-sm btn-info">
+                                Details
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+    }
+
+</div>

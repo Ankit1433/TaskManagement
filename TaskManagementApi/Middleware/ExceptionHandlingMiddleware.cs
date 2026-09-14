@@ -8,7 +8,9 @@ public class ExceptionHandlingMiddleware
     private readonly RequestDelegate _next;
     private readonly ILogger<ExceptionHandlingMiddleware> _logger;
 
-    public ExceptionHandlingMiddleware(RequestDelegate next,ILogger<ExceptionHandlingMiddleware> logger)
+    public ExceptionHandlingMiddleware(
+        RequestDelegate next,
+        ILogger<ExceptionHandlingMiddleware> logger)
     {
         _next = next;
         _logger = logger;
@@ -52,7 +54,10 @@ public class ExceptionHandlingMiddleware
         }
     }
 
-    private static async Task WriteErrorResponse(HttpContext context,HttpStatusCode statusCode,string message)
+    private static async Task WriteErrorResponse(
+        HttpContext context,
+        HttpStatusCode statusCode,
+        string message)
     {
         context.Response.StatusCode = (int)statusCode;
         context.Response.ContentType = "application/json";

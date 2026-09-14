@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using TaskManagementApi.Middleware;
 using Microsoft.OpenApi;
+using TaskManagementApi.Middleware;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -24,6 +25,19 @@ builder.Services.AddSwaggerGen(options =>
         Title = "TaskManagement API",
         Version = "v1"
     });
+    options.AddSecurityDefinition("bearer", new OpenApiSecurityScheme
+    {
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        Description = "Enter your JWT token."
+    });
+
+    options.AddSecurityRequirement(document =>
+        new OpenApiSecurityRequirement
+        {
+            [new OpenApiSecuritySchemeReference("bearer", document)] = []
+        });
 });
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
@@ -61,6 +75,7 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseSwagger();
 
 app.UseSwaggerUI();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
